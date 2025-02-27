@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Calorie Tracker</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="container p-4 bg-white shadow rounded text-center" style="max-width: 400px;">
+        <h2>Login to Calorie Tracker</h2>
+        <p>Enter your credentials to continue.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+
+        {% if form.errors %}
+            <p class="text-danger mt-3">Invalid username/email or password. Try again.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
