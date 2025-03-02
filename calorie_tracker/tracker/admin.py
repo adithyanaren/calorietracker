@@ -1,7 +1,10 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
-from .models import Meal  # Import Meal model for admin management
+from .models import Meal
+from django.contrib.auth.models import User
+
+# ✅ Unregister User first to avoid "AlreadyRegistered" error
+admin.site.unregister(User)
 
 # ✅ Custom User Admin Configuration
 class CustomUserAdmin(UserAdmin):
@@ -10,9 +13,8 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username', 'email')
     ordering = ('date_joined',)
 
-# ✅ Register the customized User model
-admin.site.unregister(User)  # Remove default User admin
-admin.site.register(User, CustomUserAdmin)  # Register with custom settings
+# ✅ Re-register User with custom settings
+admin.site.register(User, CustomUserAdmin)
 
 # ✅ Register the Meal model for admin panel access
 @admin.register(Meal)
@@ -21,3 +23,4 @@ class MealAdmin(admin.ModelAdmin):
     search_fields = ('food_item', 'user__username')
     list_filter = ('meal_type', 'date')
     ordering = ('-date',)
+    date_hierarchy = 'date'  # ✅ Adds a date-based filter in admin panel

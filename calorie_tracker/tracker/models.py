@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+
+
 class Meal(models.Model):
     MEAL_TYPES = [
         ('breakfast', 'Breakfast'),
@@ -16,6 +18,11 @@ class Meal(models.Model):
     quantity = models.FloatField()
     unit = models.CharField(max_length=20, choices=[('grams', 'Grams'), ('ml', 'Milliliters')])
     calories = models.FloatField()
+
+    # New Macronutrient Fields
+    protein = models.FloatField(default=0.0)
+    carbs = models.FloatField(default=0.0)
+    fat = models.FloatField(default=0.0)
 
     class Meta:
         unique_together = ('user', 'date', 'meal_type', 'food_item')

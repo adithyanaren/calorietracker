@@ -19,11 +19,10 @@ from django.urls import path, include
 from django.shortcuts import redirect
 
 def home_redirect(request):
-    return redirect('dashboard')  # Redirect root URL to dashboard
+    return redirect('dashboard')  # Redirect '/' to dashboard
 
 urlpatterns = [
-    path('', home_redirect, name='home'),  # Fix: Redirect '/' to 'dashboard'
+    path('', home_redirect, name='home'),
     path('admin/', admin.site.urls),
     path('', include('tracker.urls')),
 ]
-

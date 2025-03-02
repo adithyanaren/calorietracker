@@ -1,72 +1,80 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Meal Entry</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#" id="toggleTracker">Calorie Tracker</a>
-            <div class="collapse navbar-collapse justify-content-end">
-                <ul class="navbar-nav" id="trackerLinks" style="display: none;">
-                    <li class="nav-item"><a class="nav-link active" href="{% url 'meal_entry' %}">Meal Entry</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'weekly_dashboard' %}">Weekly Dashboard</a></li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a></li>
-                </ul>
-            </div>
+{% extends 'tracker/base.html' %}
+{% block title %}Meal Entry - Calorie Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center">
+        <h2 class="mt-3">🍽️ Log Your Meal</h2>
+        <p class="lead">Track your food intake and get accurate calorie calculations.</p>
+    </div>
+
+    <!-- ✅ Meal Entry Form -->
+    <div class="card shadow-lg mt-4">
+        <div class="card-body">
+            <form method="post" id="mealForm">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">📅 Date</label>
+                        <input type="date" class="form-control" name="date" id="id_date" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">🍏 Food Item</label>
+                        {{ form.food_item }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">⚖️ Quantity</label>
+                        {{ form.quantity }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">📏 Unit</label>
+                        {{ form.unit }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">🍽️ Meal Type</label>
+                        {{ form.meal_type }}
+                    </div>
+                </div>
+
+                <!-- ✅ Hidden Fields for Macronutrients -->
+                <input type="hidden" name="calories" id="id_calories">
+                <input type="hidden" name="protein" id="id_protein">
+                <input type="hidden" name="carbs" id="id_carbs">
+                <input type="hidden" name="fat" id="id_fat">
+
+                <div class="col-md-12 text-center mt-3">
+                    <button type="button" class="btn btn-info" id="fetchCalories">🔥 Fetch Calories</button>
+                    <button type="submit" class="btn btn-primary">💾 Save Meal</button>
+                </div>
+
+                <!-- ✅ Macronutrient Breakdown -->
+                <div class="col-md-12 text-center mt-3">
+                    <p><strong>🔥 Calories:</strong> <span id="calorieDisplay">N/A</span> </p>
+                    <p><strong>💪 Protein:</strong> <span id="proteinDisplay">N/A</span> </p>
+                    <p><strong>🍞 Carbs:</strong> <span id="carbsDisplay">N/A</span> </p>
+                    <p><strong>🥑 Fat:</strong> <span id="fatDisplay">N/A</span> </p>
+                </div>
+            </form>
         </div>
-    </nav>
+    </div>
 
-    <div class="container mt-5">
-        <h2>Enter Your Meal</h2>
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                {{ form.as_p }}
-            </div>
-            <button type="button" class="btn btn-info" id="fetchCalories">Fetch Calories</button>
-            <button type="submit" class="btn btn-primary">Save Meal</button>
-
-            <!-- ✅ Display Fetched Calories -->
-            <p class="mt-3"><strong>Fetched Calories: </strong><span id="calorieDisplay">N/A</span> kcal</p>
-        </form>
-
-        <h3 class="mt-5">Daily Calorie Intake</h3>
-        <table class="table table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Date</th>
-                    <th>Total Calories</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for date, total in total_calories.items %}
-                <tr>
-                    <td>{{ date }}</td>
-                    <td><strong>{{ total }}</strong> kcal</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="2" class="text-center">No meals logged yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <h3 class="mt-5">Your Meals</h3>
+    <!-- ✅ Meal Entries Table -->
+    <h3 class="mt-5">📌 Your Meals</h3>
+    <div class="table-responsive">
         <table class="table table-bordered table-hover">
-            <thead class="table-dark">
+            <thead class="table-success">
                 <tr>
-                    <th>Date</th>
-                    <th>Meal Type</th>
-                    <th>Food Item</th>
-                    <th>Quantity</th>
-                    <th>Unit</th>
-                    <th>Calories</th>
-                    <th>Actions</th>
+                    <th>📅 Date</th>
+                    <th>🍽️ Meal Type</th>
+                    <th>🍏 Food Item</th>
+                    <th>⚖️ Quantity</th>
+                    <th>📏 Unit</th>
+                    <th>🔥 Calories</th>
+                    <th>💪 Protein (g)</th>
+                    <th>🍞 Carbs (g)</th>
+                    <th>🥑 Fat (g)</th>
+                    <th>⚙️ Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -77,53 +85,74 @@
                     <td>{{ meal.food_item }}</td>
                     <td>{{ meal.quantity }}</td>
                     <td>{{ meal.unit }}</td>
-                    <td id="calories_{{ meal.id }}">{{ meal.calories }}</td>
+                    <td>{{ meal.calories }}</td>
+                    <td>{{ meal.protein }}</td>
+                    <td>{{ meal.carbs }}</td>
+                    <td>{{ meal.fat }}</td>
                     <td>
-                        <a href="{% url 'edit_meal' meal.id %}" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="{% url 'delete_meal' meal.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="{% url 'edit_meal' meal.id %}" class="btn btn-warning btn-sm">✏️ Edit</a>
+                        <a href="{% url 'delete_meal' meal.id %}" class="btn btn-danger btn-sm">🗑️ Delete</a>
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="7" class="text-center">No meals added yet.</td></tr>
+                <tr><td colspan="10" class="text-center">No meals added yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+</div>
 
-    <!-- ✅ Updated JavaScript to Display Fetched Calories -->
-    <script>
-        $(document).ready(function () {
-            $("#toggleTracker").click(function () {
-                $("#trackerLinks").toggle();
-            });
+<!-- ✅ JavaScript to Fetch Macronutrients -->
+<script>
+    // Store Django URL correctly
+    var fetchCaloriesURL = "{{ request.scheme }}://{{ request.get_host }}{% url 'fetch_calories' %}";
 
-            $("#fetchCalories").click(function () {
-                var food = $("#id_food_item").val();
-                var quantity = $("#id_quantity").val();
-                var unit = $("#id_unit").val();
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("JavaScript Loaded ✅");
 
-                if (food.trim() === "" || quantity <= 0) {
-                    alert("Please enter a valid food item and quantity.");
-                    return;
-                }
+        document.getElementById("fetchCalories").addEventListener("click", function () {
+            console.log("Fetch Button Clicked ✅");
 
-                $.ajax({
-                    url: "{% url 'fetch_calories' %}",
-                    data: { "food": food, "quantity": quantity, "unit": unit },
-                    success: function (response) {
-                        if (response.calories) {
-                            $("#id_calories").val(response.calories);  // ✅ Auto-fill hidden calories input field
-                            $("#calorieDisplay").text(response.calories);  // ✅ Display fetched calories
-                        } else {
-                            alert("Error: " + response.error);
-                        }
-                    },
-                    error: function () {
-                        alert("Failed to fetch calories. Try again.");
+            var food = document.getElementById("id_food_item").value.trim();
+            var quantity = parseFloat(document.getElementById("id_quantity").value);
+            var unit = document.getElementById("id_unit").value.trim();
+
+            if (food === "" || isNaN(quantity) || quantity <= 0) {
+                alert("Please enter a valid food item and quantity.");
+                return;
+            }
+
+            console.log("Fetching nutrients for:", food, quantity, unit);
+            console.log("Using API URL:", fetchCaloriesURL);
+
+            fetch(fetchCaloriesURL + "?food=" + encodeURIComponent(food) + "&quantity=" + encodeURIComponent(quantity) + "&unit=" + encodeURIComponent(unit))
+                .then(response => {
+                    console.log("Raw API Response:", response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("API Response ✅:", data);
+
+                    if (data.calories !== undefined) {
+                        document.getElementById("id_calories").value = data.calories;
+                        document.getElementById("id_protein").value = data.protein;
+                        document.getElementById("id_carbs").value = data.carbs;
+                        document.getElementById("id_fat").value = data.fat;
+
+                        document.getElementById("calorieDisplay").textContent = data.calories + " kcal";
+                        document.getElementById("proteinDisplay").textContent = data.protein + " g";
+                        document.getElementById("carbsDisplay").textContent = data.carbs + " g";
+                        document.getElementById("fatDisplay").textContent = data.fat + " g";
+                    } else {
+                        console.log("Error: No valid data in response", data);
+                        alert("Error fetching calories.");
                     }
+                })
+                .catch(error => {
+                    console.log("Fetch Error ❌:", error);
+                    alert("Failed to fetch calories. Try again.");
                 });
-            });
         });
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock %}

@@ -6,20 +6,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* ✅ Fix Chart Size & Padding Issues */
         .chart-container {
-            width: 80%;  /* ✅ Limits width */
-            max-width: 800px; /* ✅ Prevents stretching */
-            margin: 0 auto;  /* ✅ Centers chart */
-            padding: 20px;  /* ✅ Adds spacing */
-            background: #fff; /* ✅ Improves visibility */
-            border-radius: 10px; /* ✅ Smooth edges */
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* ✅ Soft shadow */
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#" id="toggleTracker">Calorie Tracker</a>
@@ -36,47 +34,64 @@
     </nav>
 
     <div class="container mt-5 text-center">
-        <h2 class="mb-4">Weekly Calorie Summary</h2>
-
-        <!-- ✅ Wrapped Chart in a Container for Better Display -->
+        <h2 class="mb-4">Weekly Macronutrient Breakdown</h2>
         <div class="chart-container">
-            <canvas id="weeklyChart"></canvas>
+            <canvas id="caloriesChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="proteinChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="carbsChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="fatChart"></canvas>
         </div>
     </div>
 
     <script>
         $(document).ready(function () {
             $("#toggleTracker").click(function () {
-                $("#trackerLinks").toggle();  // ✅ Show/Hide Meal Entry & Weekly Dashboard Links
+                $("#trackerLinks").toggle();
             });
         });
 
-        // ✅ Fetch weekly data from Django context and format it for Chart.js
-        var weeklyData = {
-            labels: [{% for date in weekly_data.keys %}"{{ date }}",{% endfor %}],  // ✅ Dates
-            datasets: [{
-                label: "Calories Consumed (kcal)",
-                data: [{% for total in weekly_data.values %}{{ total }},{% endfor %}],  // ✅ Calories per day
-                backgroundColor: "rgba(54, 162, 235, 0.3)",
-                borderColor: "rgba(54, 162, 235, 1)",
-                borderWidth: 2,
-                tension: 0.4,  // ✅ Makes the line smooth
-                fill: true  // ✅ Adds a light fill effect
-            }]
-        };
+        var weeklyLabels = [{% for date in weekly_data.keys %}"{{ date }}",{% endfor %}];
+        var weeklyCalories = [{% for data in weekly_data.values %}{{ data.calories }},{% endfor %}];
+        var weeklyProtein = [{% for data in weekly_data.values %}{{ data.protein }},{% endfor %}];
+        var weeklyCarbs = [{% for data in weekly_data.values %}{{ data.carbs }},{% endfor %}];
+        var weeklyFat = [{% for data in weekly_data.values %}{{ data.fat }},{% endfor %}];
 
-        var ctx = document.getElementById("weeklyChart").getContext("2d");
-        new Chart(ctx, {
-            type: "line",
-            data: weeklyData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true }
+        function createChart(canvasId, label, data, bgColor, borderColor) {
+            var ctx = document.getElementById(canvasId).getContext("2d");
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: weeklyLabels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: bgColor,
+                        borderColor: borderColor,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
                 }
-            }
-        });
+            });
+        }
+
+        createChart("caloriesChart", "Calories (kcal)", weeklyCalories, "rgba(255, 99, 132, 0.5)", "rgba(255, 99, 132, 1)");
+        createChart("proteinChart", "Protein (g)", weeklyProtein, "rgba(54, 162, 235, 0.5)", "rgba(54, 162, 235, 1)");
+        createChart("carbsChart", "Carbs (g)", weeklyCarbs, "rgba(75, 192, 192, 0.5)", "rgba(75, 192, 192, 1)");
+        createChart("fatChart", "Fat (g)", weeklyFat, "rgba(255, 206, 86, 0.5)", "rgba(255, 206, 86, 1)");
     </script>
 </body>
 </html>
