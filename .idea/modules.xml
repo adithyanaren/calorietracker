@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Django-cal-app.iml" filepath="$PROJECT_DIR$/.idea/Django-cal-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Django-calorietracker.iml" filepath="$PROJECT_DIR$/.idea/Django-calorietracker.iml" />
     </modules>
   </component>
 </project>
