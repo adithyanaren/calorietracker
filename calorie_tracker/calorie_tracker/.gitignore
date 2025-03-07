@@ -1,0 +1,10 @@
+# Ignore virtual environment and compiled files
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Ignore sensitive files
+.env
+.aws/

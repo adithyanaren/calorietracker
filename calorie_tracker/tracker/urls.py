@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import tdee_calculator
 
 urlpatterns = [
     path('fetch_calories/', views.fetch_calories, name='fetch_calories'),  # ✅ Ensure this line is present
@@ -7,6 +8,7 @@ urlpatterns = [
     path('meal_entry/<int:meal_id>/', views.meal_entry, name='edit_meal'),
     path('delete_meal/<int:meal_id>/', views.delete_meal, name='delete_meal'),
     path('weekly_dashboard/', views.weekly_dashboard, name='weekly_dashboard'),
+    path('tdee_calculator/', tdee_calculator, name='tdee_calculator'),
     path('dashboard/', views.dashboard, name='dashboard'),
     # path('register/', views.register, name='register'),
     path('login/', views.custom_login, name='login'),

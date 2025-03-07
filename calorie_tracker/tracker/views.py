@@ -3,11 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
-from django.contrib.auth.models import User
-from .models import Meal
-from .forms import MealForm
 import requests
 from django.utils.timezone import now, timedelta
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Meal, TDEECalculator
+from .forms import MealForm, TDEECalculatorForm
+from django.utils.timezone import now, timedelta
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import TDEECalculator
+from .forms import TDEECalculatorForm
 
 # ✅ Custom Login View (Prevents Authenticated Users from Accessing Login Page)
 def custom_login(request):
@@ -145,6 +151,30 @@ def weekly_dashboard(request):
             weekly_data[meal_date]["fat"] += meal.fat
 
     return render(request, 'tracker/weekly_dashboard.html', {'weekly_data': weekly_data})
+
+
+@login_required
+def tdee_calculator(request):
+    """Handles TDEE calculation and form submission"""
+
+    # ✅ Ensure we get an instance or None instead of creating an invalid entry
+    tdee_instance = TDEECalculator.objects.filter(user=request.user).first()
+
+    if request.method == 'POST':
+        form = TDEECalculatorForm(request.POST, instance=tdee_instance)
+        if form.is_valid():
+            tdee_instance = form.save(commit=False)
+            tdee_instance.user = request.user
+            tdee_instance.calculate_tdee()
+            tdee_instance.save()
+            return redirect('tdee_calculator')  # Reload to display result
+
+    else:
+        form = TDEECalculatorForm(instance=tdee_instance)
+
+    return render(request, 'tracker/tdee_calculator.html',
+                  {'form': form, 'tdee': tdee_instance.tdee if tdee_instance else None})
+
 
 # ✅ Custom Logout
 def custom_logout(request):

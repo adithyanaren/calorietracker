@@ -8,7 +8,7 @@
 </div>
 
 <div class="row mt-4">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card border-success shadow">
             <div class="card-body text-center">
                 <h4 class="card-title"><i class="fas fa-utensils"></i> Log a Meal</h4>
@@ -17,12 +17,30 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+
+    <div class="col-md-4">
         <div class="card border-info shadow">
             <div class="card-body text-center">
                 <h4 class="card-title"><i class="fas fa-chart-line"></i> Weekly Stats</h4>
                 <p>Visualize your calorie intake over the week.</p>
                 <a href="{% url 'weekly_dashboard' %}" class="btn btn-info"><i class="fas fa-chart-bar"></i> View Stats</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ New TDEE Section -->
+    <div class="col-md-4">
+        <div class="card border-warning shadow">
+            <div class="card-body text-center">
+                <h4 class="card-title"><i class="fas fa-calculator"></i> TDEE Calculator</h4>
+                <p>Calculate your daily energy needs.</p>
+                <a href="{% url 'tdee_calculator' %}" class="btn btn-warning"><i class="fas fa-bolt"></i> Calculate TDEE</a>
+
+                {% if user.tdeecalculator.tdee %}
+                    <p class="mt-2"><strong>Your TDEE:</strong> <span class="badge bg-warning text-dark">{{ user.tdeecalculator.tdee|floatformat:2 }} kcal/day</span></p>
+                {% else %}
+                    <p class="mt-2 text-muted">No TDEE calculated yet.</p>
+                {% endif %}
             </div>
         </div>
     </div>
