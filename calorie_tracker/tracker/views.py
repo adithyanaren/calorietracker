@@ -14,6 +14,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import TDEECalculator
 from .forms import TDEECalculatorForm
+from django.http import JsonResponse
+from .sns_utils import send_meal_reminder
+
 
 # ✅ Custom Login View (Prevents Authenticated Users from Accessing Login Page)
 def custom_login(request):
@@ -180,3 +183,27 @@ def tdee_calculator(request):
 def custom_logout(request):
     logout(request)
     return redirect('login')
+
+def send_meal_notification(request):
+    if request.method == "POST":
+        response = send_meal_reminder()
+        return JsonResponse({"message": "Meal reminder sent!", "sns_response": response})
+
+
+from django.contrib.auth.models import User
+from .forms import RegisterForm
+from django.contrib import messages
+
+def register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.is_active = False  # Inactive until admin approval
+            user.save()
+            messages.success(request, 'Account created! Await admin approval.')
+            return redirect('login')
+    else:
+        form = RegisterForm()
+    return render(request, 'registration/register.html', {'form': form})

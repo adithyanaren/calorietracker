@@ -1,0 +1,12 @@
+# Ignore virtual environment and compiled files
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Ignore sensitive files
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

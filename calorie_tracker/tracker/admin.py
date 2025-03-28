@@ -13,6 +13,15 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('username', 'email')
     ordering = ('date_joined',)
 
+    def activate_users(self, request, queryset):
+        queryset.update(is_active=True)
+
+    activate_users.short_description = "Activate selected users"
+
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
 # ✅ Re-register User with custom settings
 admin.site.register(User, CustomUserAdmin)
 
